@@ -4,7 +4,7 @@ export async function POST(req) {
 
     // Basic static summarization: Get first 3 sentences
     const sentences = content.split('.').filter(Boolean);
-    const summary = sentences.slice(0, 3).join('. ') + '.';
+    const summary = sentences.slice(0, 10).join('. ') + '.';
 
     return Response.json({ success: true, summary });
   } catch (error) {
