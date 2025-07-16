@@ -16,7 +16,7 @@ import {
   ExternalLink, 
   ScrollText,
   History,
-  // Star,
+//   Star,
   Settings,
   Download,
   Share2,
@@ -38,12 +38,12 @@ import {
   Eye,
   BookOpen,
   Award,
-  // Target,
-  // Lightbulb,
+//   Target,
+//   Lightbulb,
   Users,
   Heart,
   MessageCircle,
-  // ThumbsUp,
+//   ThumbsUp,
   Rss
 } from 'lucide-react';
 
@@ -116,24 +116,71 @@ export default function EnhancedBlogSummarizer() {
     setUrduSummary('');
 
     try {
-      // Simulate API calls with realistic delays
+      // 1. Scrape blog content
       setCurrentStep(1);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setBlogText('This is a sample blog content that has been extracted from the provided URL. The content discusses various aspects of technology, innovation, and future trends in the digital world...');
+      const scrapeRes = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+      if (!scrapeRes.ok) throw new Error('Failed to scrape content');
+      const scraped = await scrapeRes.json();
+      setBlogText(scraped.content || '');
 
+      // 2. Generate AI summary
       setCurrentStep(2);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSummary('This blog explores the intersection of artificial intelligence and human creativity, discussing how AI tools are becoming essential for content creators while maintaining the importance of human insight and originality in the creative process.');
+      const summaryRes = await fetch('/api/summarise', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: scraped.content }),
+      });
+      if (!summaryRes.ok) throw new Error('Failed to generate summary');
+      const summaryData = await summaryRes.json();
+      setSummary(summaryData.summary);
 
+      // 3. Translate to Urdu
       setCurrentStep(3);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setUrduSummary('یہ بلاگ مصنوعی ذہانت اور انسانی تخلیقی صلاحیت کے درمیان تعلق کو تلاش کرتا ہے، اس بات پر بحث کرتے ہوئے کہ کیسے AI ٹولز مواد تخلیق کرنے والوں کے لیے ضروری بن رہے ہیں۔');
+      const urduRes = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: summaryData.summary, targetLanguage: selectedLanguage }),
+      });
+      if (!urduRes.ok) throw new Error('Failed to translate summary');
+      const urduData = await urduRes.json();
+      setUrduSummary(urduData.translation);
 
+      // 4. Save to databases
       setCurrentStep(4);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await Promise.all([
+        fetch('/api/save-summary', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url, summary: urduData.translation }),
+        }),
+        fetch('/api/save-fulltext', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url, content: scraped.content }),
+        })
+      ]);
+
       setCurrentStep(5);
-    } catch {
-      setError('Failed to process the blog. Please try again.');
+    } catch (err: unknown) { // Changed 'any' to 'unknown'
+      if (err instanceof Error) { // Type guard to safely access 'message'
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
