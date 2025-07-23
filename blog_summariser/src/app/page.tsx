@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +16,6 @@ import {
   ExternalLink, 
   ScrollText,
   History,
-//   Star,
   Settings,
   Download,
   Share2,
@@ -26,10 +25,6 @@ import {
   BarChart3,
   Filter,
   Search,
-  Moon,
-  Sun,
-  Menu,
-  X,
   ChevronDown,
   Zap,
   Shield,
@@ -37,14 +32,12 @@ import {
   TrendingUp,
   Eye,
   BookOpen,
-  Award,
-//   Target,
-//   Lightbulb,
   Users,
   Heart,
   MessageCircle,
-//   ThumbsUp,
-  Rss
+  Rss,
+  X,
+  Menu,
 } from 'lucide-react';
 
 export default function EnhancedBlogSummarizer() {
@@ -56,7 +49,8 @@ export default function EnhancedBlogSummarizer() {
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [darkMode, setDarkMode] = useState(false);
+  // Remove darkMode state
+  // const [darkMode, setDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState('summarize');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('urdu');
@@ -70,17 +64,57 @@ export default function EnhancedBlogSummarizer() {
     { label: 'Saving to database', icon: CheckCircle }
   ];
 
-  const recentSummaries = [
-    { title: 'AI and Machine Learning Trends', url: 'https://example.com/ai-ml-trends', time: '2 hours ago' },
-    { title: 'Future of Web Development', url: 'https://example.com/web-dev-future', time: '5 hours ago' },
-    { title: 'Digital Marketing Strategies', url: 'https://example.com/marketing', time: '1 day ago' }
-  ];
+  // State for live recent summaries
+  const [recentSummaries, setRecentSummaries] = useState<Array<{ title?: string; url: string; created_at?: string }>>([]);
+  const [recentSummariesLoading, setRecentSummariesLoading] = useState(true);
+  const [recentSummariesError, setRecentSummariesError] = useState('');
 
-  const popularBlogs = [
-    { title: 'The Rise of AI in Healthcare', reads: '1.2k', category: 'Technology' },
-    { title: 'Sustainable Energy Solutions', reads: '890', category: 'Environment' },
-    { title: 'Remote Work Best Practices', reads: '756', category: 'Business' }
-  ];
+  useEffect(() => {
+    async function fetchRecentSummaries() {
+      setRecentSummariesLoading(true);
+      setRecentSummariesError('');
+      try {
+        const res = await fetch('/api/recent-summaries');
+        const data = await res.json();
+        if (data.success) {
+          setRecentSummaries(data.summaries);
+        } else {
+          setRecentSummariesError('Failed to load recent summaries');
+        }
+      } catch (err) {
+        setRecentSummariesError('Failed to load recent summaries');
+      } finally {
+        setRecentSummariesLoading(false);
+      }
+    }
+    fetchRecentSummaries();
+  }, []);
+
+  // State for live popular blogs
+  const [popularBlogs, setPopularBlogs] = useState<Array<{ title?: string; url?: string; category?: string; reads?: number }>>([]);
+  const [popularBlogsLoading, setPopularBlogsLoading] = useState(true);
+  const [popularBlogsError, setPopularBlogsError] = useState('');
+
+  useEffect(() => {
+    async function fetchPopularBlogs() {
+      setPopularBlogsLoading(true);
+      setPopularBlogsError('');
+      try {
+        const res = await fetch('/api/popular-blogs');
+        const data = await res.json();
+        if (data.success) {
+          setPopularBlogs(data.blogs);
+        } else {
+          setPopularBlogsError('Failed to load popular blogs');
+        }
+      } catch (err) {
+        setPopularBlogsError('Failed to load popular blogs');
+      } finally {
+        setPopularBlogsLoading(false);
+      }
+    }
+    fetchPopularBlogs();
+  }, []);
 
   const features = [
     { icon: Zap, title: 'Lightning Fast', description: 'Get summaries in seconds' },
@@ -89,20 +123,40 @@ export default function EnhancedBlogSummarizer() {
     { icon: Sparkles, title: 'AI Powered', description: 'Advanced GPT technology' }
   ];
 
-  const stats = [
-    { value: '50K+', label: 'Blogs Summarized', icon: FileText },
-    { value: '25+', label: 'Languages Supported', icon: Languages },
-    { value: '10K+', label: 'Happy Users', icon: Users },
-    { value: '99.9%', label: 'Uptime', icon: TrendingUp }
-  ];
+  // State for live stats
+  const [stats, setStats] = useState({
+    totalSummaries: null,
+    totalBlogs: null,
+    totalUsers: null,
+    uptime: null,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState('');
+
+  useEffect(() => {
+    async function fetchStats() {
+      setStatsLoading(true);
+      setStatsError('');
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        if (data.success) {
+          setStats(data.stats);
+        } else {
+          setStatsError('Failed to load stats');
+        }
+      } catch (err) {
+        setStatsError('Failed to load stats');
+      } finally {
+        setStatsLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
 
   const languages = [
+    { code: 'english', name: 'English', flag: '🇬🇧' },
     { code: 'urdu', name: 'Urdu', flag: '🇵🇰' },
-    { code: 'arabic', name: 'Arabic', flag: '🇸🇦' },
-    { code: 'spanish', name: 'Spanish', flag: '🇪🇸' },
-    { code: 'french', name: 'French', flag: '🇫🇷' },
-    { code: 'german', name: 'German', flag: '🇩🇪' },
-    { code: 'hindi', name: 'Hindi', flag: '🇮🇳' }
   ];
 
   const handleSubmit = async () => {
@@ -300,7 +354,7 @@ export default function EnhancedBlogSummarizer() {
   );
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'}`}>
+    <div className={`min-h-screen transition-colors duration-300 bg-gradient-to-br from-blue-50 via-white to-purple-50`}>
       <MobileSidebar />
       
       {/* Header */}
@@ -330,12 +384,8 @@ export default function EnhancedBlogSummarizer() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setDarkMode(!darkMode)}
                 className="w-9 h-9 p-0"
               >
-                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </Button>
-              <Button variant="ghost" size="sm" className="w-9 h-9 p-0">
                 <User className="w-4 h-4" />
               </Button>
             </div>
@@ -362,20 +412,55 @@ export default function EnhancedBlogSummarizer() {
               
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="flex justify-center mb-2">
-                      <stat.icon className="w-6 h-6 text-blue-600" />
+                {statsLoading ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="text-center animate-pulse">
+                      <div className="flex justify-center mb-2">
+                        <Loader2 className="w-6 h-6 text-blue-300" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-300">---</div>
+                      <div className="text-sm text-gray-300">Loading...</div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                    <div className="text-sm text-gray-600">{stat.label}</div>
-                  </div>
-                ))}
+                  ))
+                ) : statsError ? (
+                  <div className="col-span-4 text-center text-red-600">{statsError}</div>
+                ) : (
+                  <>
+                    <div className="text-center">
+                      <div className="flex justify-center mb-2">
+                        <FileText className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{stats.totalSummaries ?? '---'}</div>
+                      <div className="text-sm text-gray-600">Blogs Summarized</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex justify-center mb-2">
+                        <Languages className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">1+</div>
+                      <div className="text-sm text-gray-600">Languages Supported</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex justify-center mb-2">
+                        <Users className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{stats.totalUsers ?? '---'}</div>
+                      <div className="text-sm text-gray-600">Happy Users</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex justify-center mb-2">
+                        <TrendingUp className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{stats.uptime ?? '---'}</div>
+                      <div className="text-sm text-gray-600">Uptime</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
             {/* Advanced Input Section */}
-            <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl mb-8">
+            <Card className="shadow-2xl border-0 bg-card rounded-2xl mb-8">
               <CardHeader className="pb-6">
                 <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                   <Globe className="w-6 h-6 text-blue-600" />
@@ -483,7 +568,7 @@ export default function EnhancedBlogSummarizer() {
 
             {/* Progress Steps */}
             {loading && (
-              <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl mb-8">
+              <Card className="shadow-xl border-0 bg-card rounded-2xl mb-8">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
                     <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
@@ -544,7 +629,7 @@ export default function EnhancedBlogSummarizer() {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                   {/* Original Content */}
                   {blogText && (
-                    <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl">
+                    <Card className="shadow-xl border-0 bg-card rounded-2xl">
                       <CardHeader className="pb-4">
                         <CardTitle className="flex items-center justify-between text-xl font-bold text-gray-800">
                           <div className="flex items-center gap-3">
@@ -592,7 +677,7 @@ export default function EnhancedBlogSummarizer() {
 
                   {/* AI Summary */}
                   {summary && (
-                    <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl">
+                    <Card className="shadow-xl border-0 bg-card rounded-2xl">
                       <CardHeader className="pb-4">
                         <CardTitle className="flex items-center justify-between text-xl font-bold text-gray-800">
                           <div className="flex items-center gap-3">
@@ -640,7 +725,7 @@ export default function EnhancedBlogSummarizer() {
 
                 {/* Translation */}
                 {urduSummary && (
-                  <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl">
+                  <Card className="shadow-xl border-0 bg-card rounded-2xl">
                     <CardHeader className="pb-4">
                       <CardTitle className="flex items-center justify-between text-xl font-bold text-gray-800">
                         <div className="flex items-center gap-3">
@@ -712,7 +797,7 @@ export default function EnhancedBlogSummarizer() {
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
               {features.map((feature, index) => (
-                <Card key={index} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm rounded-xl hover:shadow-xl transition-shadow duration-300">
+                <Card key={index} className="shadow-lg border-0 bg-card rounded-xl hover:shadow-xl transition-shadow duration-300">
                   <CardContent className="p-6 text-center">
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <feature.icon className="w-6 h-6 text-white" />
@@ -747,34 +832,51 @@ export default function EnhancedBlogSummarizer() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {recentSummaries.map((item, index) => (
-                <Card key={index} className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl hover:shadow-xl transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-800 flex-1">{item.title}</h3>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Bookmark className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Share2 className="w-4 h-4" />
+              {recentSummariesLoading ? (
+                Array.from({ length: 2 }).map((_, index) => (
+                  <Card key={index} className="shadow-lg border-0 bg-card rounded-xl animate-pulse">
+                    <CardContent className="p-6">
+                      <div className="h-6 bg-gray-200 rounded w-1/2 mb-3" />
+                      <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
+                      <div className="h-4 bg-gray-100 rounded w-1/3 mb-2" />
+                      <div className="h-8 bg-gray-100 rounded w-full" />
+                    </CardContent>
+                  </Card>
+                ))
+              ) : recentSummariesError ? (
+                <div className="col-span-2 text-center text-red-600">{recentSummariesError}</div>
+              ) : recentSummaries.length === 0 ? (
+                <div className="col-span-2 text-center text-gray-500">No recent summaries found.</div>
+              ) : (
+                recentSummaries.map((item, index) => (
+                  <Card key={index} className="shadow-lg border-0 bg-card rounded-xl hover:shadow-xl transition-shadow duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-gray-800 flex-1">{item.title || item.url}</h3>
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="sm">
+                            <Bookmark className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Share2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">{item.url}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Clock className="w-4 h-4" />
+                          {item.created_at ? new Date(item.created_at).toLocaleString() : ''}
+                        </div>
+                        <Button variant="outline" size="sm">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View
                         </Button>
                       </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">{item.url}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Clock className="w-4 h-4" />
-                        {item.time}
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4 mr-2" />
-                        View
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -785,7 +887,7 @@ export default function EnhancedBlogSummarizer() {
             <h2 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl">
+              <Card className="shadow-lg border-0 bg-card rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -803,7 +905,7 @@ export default function EnhancedBlogSummarizer() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl">
+              <Card className="shadow-lg border-0 bg-card rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -821,7 +923,7 @@ export default function EnhancedBlogSummarizer() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl">
+              <Card className="shadow-lg border-0 bg-card rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -840,24 +942,40 @@ export default function EnhancedBlogSummarizer() {
               </Card>
             </div>
 
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl">
+            <Card className="shadow-lg border-0 bg-card rounded-xl">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-gray-800">Popular Blog Categories</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {popularBlogs.map((blog, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <h3 className="font-semibold text-gray-800">{blog.title}</h3>
-                        <p className="text-sm text-gray-600">{blog.category}</p>
+                  {popularBlogsLoading ? (
+                    Array.from({ length: 3 }).map((_, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg animate-pulse">
+                        <div>
+                          <div className="h-5 w-32 bg-gray-200 rounded mb-2" />
+                          <div className="h-4 w-20 bg-gray-100 rounded" />
+                        </div>
+                        <div className="h-4 w-16 bg-gray-100 rounded" />
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Eye className="w-4 h-4" />
-                        {blog.reads} reads
+                    ))
+                  ) : popularBlogsError ? (
+                    <div className="text-center text-red-600">{popularBlogsError}</div>
+                  ) : popularBlogs.length === 0 ? (
+                    <div className="text-center text-gray-500">No popular blogs found.</div>
+                  ) : (
+                    popularBlogs.map((blog, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                          <h3 className="font-semibold text-gray-800">{blog.title || blog.url}</h3>
+                          <p className="text-sm text-gray-600">{blog.category || ''}</p>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Eye className="w-4 h-4" />
+                          {blog.reads !== undefined ? `${blog.reads} reads` : ''}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -870,22 +988,21 @@ export default function EnhancedBlogSummarizer() {
             <h2 className="text-3xl font-bold text-gray-900">Settings</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl">
+              <Card className="shadow-lg border-0 bg-card rounded-xl">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-gray-800">Preferences</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold text-gray-800">Dark Mode</h3>
+                      <h3 className="font-semibold text-gray-800">Default Language</h3>
                       <p className="text-sm text-gray-600">Enable dark theme</p>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setDarkMode(!darkMode)}
+                      onClick={() => {}}
                     >
-                      {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     </Button>
                   </div>
                   
@@ -903,38 +1020,6 @@ export default function EnhancedBlogSummarizer() {
                     <Button variant="outline" size="sm">
                       <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
                       Enabled
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-800">Account</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800">John Doe</h3>
-                      <p className="text-sm text-gray-600">john@example.com</p>
-                    </div>
-                  </div>
-                  
-                  <div className="border-t pt-4 space-y-2">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Award className="w-4 h-4 mr-2" />
-                      Upgrade to Pro
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
-                      <AlertCircle className="w-4 h-4 mr-2" />
-                      Sign Out
                     </Button>
                   </div>
                 </CardContent>

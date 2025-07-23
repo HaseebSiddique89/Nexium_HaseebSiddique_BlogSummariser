@@ -1,292 +1,43 @@
-const urduDictionary = {
-  // Tech
-  "technology": "ٹیکنالوجی",
-  "internet": "انٹرنیٹ",
-  "computer": "کمپیوٹر",
-  "software": "سافٹ ویئر",
-  "hardware": "ہارڈ ویئر",
-  "programming": "پروگرامنگ",
-  "coding": "کوڈنگ",
-  "developer": "ڈویلپر",
-  "website": "ویب سائٹ",
-  "application": "ایپلیکیشن",
-  "platform": "پلیٹ فارم",
-  "network": "نیٹ ورک",
-  "database": "ڈیٹابیس",
-  "server": "سرور",
-  "frontend": "فرنٹ اینڈ",
-  "backend": "بیک اینڈ",
-  "user": "صارف",
-  "interface": "انٹرفیس",
-
-  // Science & Innovation
-  "science": "سائنس",
-  "research": "تحقیق",
-  "experiment": "تجربہ",
-  "innovation": "جدت",
-  "laboratory": "لیبارٹری",
-  "analysis": "تجزیہ",
-  "physics": "فزکس",
-  "chemistry": "کیمسٹری",
-  "biology": "بیالوجی",
-
-  // Health & Wellness
-  "health": "صحت",
-  "fitness": "فٹنس",
-  "exercise": "ورزش",
-  "mental": "ذہنی",
-  "physical": "جسمانی",
-  "wellbeing": "فلاح",
-  "nutrition": "غذا",
-  "diet": "خوراک",
-  "disease": "بیماری",
-  "treatment": "علاج",
-
-  // Education & Development
-  "education": "تعلیم",
-  "learning": "سیکھنا",
-  "school": "اسکول",
-  "college": "کالج",
-  "university": "یونیورسٹی",
-  "student": "طالب علم",
-  "teacher": "استاد",
-  "course": "کورس",
-  "exam": "امتحان",
-  "result": "نتیجہ",
-  "study": "مطالعہ",
-  "development": "ترقی",
-  "career": "کیرئیر",
-
-  // Blog & Content
-  "blog": "بلاگ",
-  "article": "مضمون",
-  "content": "مواد",
-  "summary": "خلاصہ",
-  "paragraph": "پیراگراف",
-  "sentence": "جملہ",
-  "language": "زبان",
-  "title": "عنوان",
-  "headline": "سرخی",
-  "author": "مصنف",
-  "publish": "شائع کرنا",
-  "reader": "قارئ",
-  "information": "معلومات",
-  "topic": "موضوع",
-  "subject": "مضمون",
-
-  // General
-  "world": "دنیا",
-  "future": "مستقبل",
-  "technology": "ٹیکنالوجی",
-  "knowledge": "علم",
-  "power": "طاقت",
-  "change": "تبدیلی",
-  "growth": "ترقی",
-  "time": "وقت",
-  "day": "دن",
-  "life": "زندگی",
-  "people": "لوگ",
-  "system": "نظام",
-  "problem": "مسئلہ",
-  "solution": "حل",
-
-  "and": "اور",
-  "or": "یا",
-  "the": "دی",
-  "a": "ایک",
-  "an": "ایک",
-  "of": "کا",
-  "to": "کے لیے",
-  "in": "میں",
-  "for": "کے لیے",
-  "on": "پر",
-  "with": "کے ساتھ",
-  "by": "کی طرف سے",
-  "about": "کے بارے میں",
-  "this": "یہ",
-  "that": "وہ",
-  "these": "یہ",
-  "those": "وہ",
-  "is": "ہے",
-  "are": "ہیں",
-  "was": "تھا",
-  "were": "تھے",
-  "be": "ہونا",
-  "have": "رکھنا",
-  "has": "ہے",
-  "had": "تھا",
-  "do": "کرو",
-  "does": "کرتا ہے",
-  "did": "کیا",
-  "can": "سکتا ہے",
-  "will": "کرے گا",
-  "would": "کرتا",
-  "should": "چاہیے",
-  "could": "سکتا تھا",
-  "may": "ہو سکتا ہے",
-  "might": "شاید",
-  "must": "ضرور",
-
-  "person": "شخص",
-  "people": "لوگ",
-  "man": "مرد",
-  "woman": "عورت",
-  "child": "بچہ",
-  "children": "بچے",
-  "student": "طالب علم",
-  "teacher": "استاد",
-  "developer": "ڈویلپر",
-  "programmer": "پروگرامر",
-  "engineer": "انجینئر",
-  "scientist": "سائنسدان",
-  "doctor": "ڈاکٹر",
-  "nurse": "نرس",
-  "researcher": "محقق",
-  "manager": "مینجر",
-  "leader": "رہنما",
-  "worker": "مزدور",
-
-  "world": "دنیا",
-  "country": "ملک",
-  "city": "شہر",
-  "village": "گاؤں",
-  "school": "اسکول",
-  "college": "کالج",
-  "university": "یونیورسٹی",
-  "hospital": "ہسپتال",
-  "office": "دفتر",
-  "home": "گھر",
-  "house": "مکان",
-  "market": "بازار",
-  "station": "اسٹیشن",
-  "room": "کمرہ",
-  "lab": "لیب",
-  "laboratory": "لیبارٹری",
-
-  "technology": "ٹیکنالوجی",
-  "science": "سائنس",
-  "computer": "کمپیوٹر",
-  "internet": "انٹرنیٹ",
-  "software": "سافٹ ویئر",
-  "hardware": "ہارڈ ویئر",
-  "code": "کوڈ",
-  "coding": "کوڈنگ",
-  "programming": "پروگرامنگ",
-  "database": "ڈیٹابیس",
-  "network": "نیٹ ورک",
-  "server": "سرور",
-  "website": "ویب سائٹ",
-  "browser": "براؤزر",
-  "cloud": "کلاؤڈ",
-  "AI": "مصنوعی ذہانت",
-  "machine": "مشین",
-  "learning": "سیکھنا",
-  "robot": "روبوٹ",
-
-  "education": "تعلیم",
-  "knowledge": "علم",
-  "learning": "سیکھنا",
-  "teaching": "پڑھانا",
-  "training": "تربیت",
-  "course": "کورس",
-  "subject": "مضمون",
-  "chapter": "باب",
-  "book": "کتاب",
-  "notes": "نوٹس",
-  "lecture": "لیکچر",
-  "exam": "امتحان",
-  "test": "ٹیسٹ",
-  "result": "نتیجہ",
-  "degree": "ڈگری",
-
-  "health": "صحت",
-  "wellness": "فلاح",
-  "fitness": "فٹنس",
-  "exercise": "ورزش",
-  "diet": "خوراک",
-  "nutrition": "غذا",
-  "treatment": "علاج",
-  "disease": "بیماری",
-  "medicine": "ادویات",
-  "doctor": "ڈاکٹر",
-  "nurse": "نرس",
-  "hospital": "ہسپتال",
-  "patient": "مریض",
-  "mental": "ذہنی",
-  "physical": "جسمانی",
-  "stress": "تناؤ",
-  "anxiety": "پریشانی",
-  "depression": "اداسی",
-  "therapy": "تھراپی",
-  "vaccine": "ویکسین",
-
-  "love": "محبت",
-  "hate": "نفرت",
-  "peace": "امن",
-  "war": "جنگ",
-  "happy": "خوش",
-  "sad": "اداس",
-  "angry": "غصہ",
-  "hope": "امید",
-  "fear": "خوف",
-  "help": "مدد",
-  "support": "سہارا",
-  "community": "برادری",
-  "family": "خاندان",
-  "friend": "دوست",
-  "enemy": "دشمن",
-  "speak": "بولنا",
-  "write": "لکھنا",
-  "read": "پڑھنا",
-  "listen": "سننا",
-  "walk": "چلنا",
-  "run": "دوڑنا",
-  "work": "کام کرنا",
-  "play": "کھیلنا",
-  "sleep": "سونا",
-  "wake": "جاگنا",
-
-  "blog": "بلاگ",
-  "post": "تحریر",
-  "article": "مضمون",
-  "content": "مواد",
-  "title": "عنوان",
-  "subtitle": "ذیلی عنوان",
-  "headline": "سرخی",
-  "summary": "خلاصہ",
-  "paragraph": "پیراگراف",
-  "sentence": "جملہ",
-  "word": "لفظ",
-  "author": "مصنف",
-  "writer": "لکھاری",
-  "editor": "مدیر",
-  "publish": "شائع کرنا",
-  "share": "شئیر کرنا",
-  "comment": "تبصرہ",
-  "review": "جائزہ",
-  "feedback": "رائے",
-  "news": "خبریں",
-  "media": "میڈیا",
-  "video": "ویڈیو",
-  "image": "تصویر",
-  "picture": "تصویر"
-};
-
+import { NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req) {
   try {
-    const { text } = await req.json();
-
-    let translated = text;
-
-    // Replace known words using the dictionary
-    for (const [english, urdu] of Object.entries(urduDictionary)) {
-      const regex = new RegExp(`\\b${english}\\b`, 'gi');
-      translated = translated.replace(regex, urdu);
+    let { text, targetLanguage } = await req.json();
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error('Gemini API key not set.');
+      return NextResponse.json({ success: false, error: 'Gemini API key not set.' });
     }
 
-    return Response.json({ success: true, translation: translated });
+    // Trim whitespace and empty lines from start and end
+    text = (text || '').replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');
+    if (!text) {
+      return NextResponse.json({ success: false, error: 'No text provided for translation.' });
+    }
+
+    // Use the requested language, default to Urdu
+    const language = targetLanguage || 'urdu';
+
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = `Translate the following text to ${language} and just provide the translation, no extra text: ${text}`;
+    console.log('Prompt to Gemini:', prompt);
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+    console.log('Gemini SDK response:', response);
+
+    // The SDK response may have a .text property or similar
+    let translation = response.text || '';
+    // Trim whitespace and empty lines from translation
+    translation = translation.replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');
+    console.log('Extracted translation:', translation);
+
+    return NextResponse.json({ success: true, translation });
   } catch (error) {
-    return Response.json({ success: false, error: error.message });
+    console.error('Translation API error:', error);
+    return NextResponse.json({ success: false, error: error.message });
   }
 }
