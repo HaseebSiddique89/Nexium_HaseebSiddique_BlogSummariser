@@ -155,12 +155,6 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## License
-
-MIT
-
----
-
 ## Credits
 
 - [HuggingFace Transformers](https://huggingface.co/)
@@ -170,7 +164,8 @@ MIT
 
 ---
 
-###check live App here https://nexium-haseeb-siddique-blog-summari.vercel.app/
+### check live App here https://nexium-haseeb-siddique-blog-summari.vercel.app/
+
 
 **Feel free to open issues or contribute!**
 
