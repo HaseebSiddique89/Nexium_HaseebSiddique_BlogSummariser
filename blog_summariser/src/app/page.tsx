@@ -40,6 +40,16 @@ import {
   Menu,
 } from 'lucide-react';
 
+type Summary = {
+  id?: number;
+  url: string;
+  summary?: string;
+  created_at?: string;
+  reads?: number;
+  title?: string;
+  category?: string;
+};
+
 export default function EnhancedBlogSummarizer() {
   const [url, setUrl] = useState('');
   const [blogText, setBlogText] = useState('');
@@ -56,6 +66,12 @@ export default function EnhancedBlogSummarizer() {
   const [selectedLanguage, setSelectedLanguage] = useState('urdu');
   const [summaryLength, setSummaryLength] = useState('medium');
   const [summaryStyle, setSummaryStyle] = useState('professional');
+  // Remove title and category state
+  // const [title, setTitle] = useState('');
+  // const [category, setCategory] = useState('');
+  const [viewedSummary, setViewedSummary] = useState<Summary | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [totalSummaries, setTotalSummaries] = useState<number | null>(null);
 
   const steps = [
     { label: 'Scraping blog content', icon: Globe },
@@ -65,7 +81,7 @@ export default function EnhancedBlogSummarizer() {
   ];
 
   // State for live recent summaries
-  const [recentSummaries, setRecentSummaries] = useState<Array<{ title?: string; url: string; created_at?: string }>>([]);
+  const [recentSummaries, setRecentSummaries] = useState<Array<{ title?: string; url: string; created_at?: string; category?: string; reads?: number }>>([]);
   const [recentSummariesLoading, setRecentSummariesLoading] = useState(true);
   const [recentSummariesError, setRecentSummariesError] = useState('');
 
@@ -119,7 +135,7 @@ export default function EnhancedBlogSummarizer() {
   const features = [
     { icon: Zap, title: 'Lightning Fast', description: 'Get summaries in seconds' },
     { icon: Shield, title: 'Secure & Private', description: 'Your data stays protected' },
-    { icon: Languages, title: 'Multi-language', description: 'Support for 50+ languages' },
+    { icon: Languages, title: 'Multi-language', description: 'Support for 20+ languages' },
     { icon: Sparkles, title: 'AI Powered', description: 'Advanced GPT technology' }
   ];
 
@@ -154,10 +170,58 @@ export default function EnhancedBlogSummarizer() {
     fetchStats();
   }, []);
 
+  // Fetch total summaries count from backend
+  useEffect(() => {
+    async function fetchTotalSummaries() {
+      try {
+        const res = await fetch('/api/total-summaries');
+        const data = await res.json();
+        if (data.success) {
+          setTotalSummaries(data.count);
+        } else {
+          setTotalSummaries(null);
+        }
+      } catch {
+        setTotalSummaries(null);
+      }
+    }
+    fetchTotalSummaries();
+  }, []);
+
   const languages = [
     { code: 'english', name: 'English', flag: '🇬🇧' },
     { code: 'urdu', name: 'Urdu', flag: '🇵🇰' },
+    { code: 'arabic', name: 'Arabic', flag: '🇸🇦' },
+    { code: 'german', name: 'German', flag: '🇩🇪' },
+    { code: 'french', name: 'French', flag: '🇫🇷' },
+    { code: 'pashto', name: 'Pashto', flag: '🇦🇫' },
+    { code: 'spanish', name: 'Spanish', flag: '🇪🇸' },
+    { code: 'italian', name: 'Italian', flag: '🇮🇹' },
+    { code: 'russian', name: 'Russian', flag: '🇷🇺' },
+    { code: 'chinese', name: 'Chinese', flag: '🇨🇳' },
+    { code: 'japanese', name: 'Japanese', flag: '🇯🇵' },
+    { code: 'portuguese', name: 'Portuguese', flag: '🇵🇹' },
+    { code: 'turkish', name: 'Turkish', flag: '🇹🇷' },
+    { code: 'hindi', name: 'Hindi', flag: '🇮🇳' },
+    { code: 'bengali', name: 'Bengali', flag: '🇧🇩' },
+    { code: 'persian', name: 'Persian', flag: '🇮🇷' },
+    { code: 'korean', name: 'Korean', flag: '🇰🇷' },
+    { code: 'dutch', name: 'Dutch', flag: '🇳🇱' },
+    { code: 'swahili', name: 'Swahili', flag: '🇰🇪' },
+    { code: 'thai', name: 'Thai', flag: '🇹🇭' },
+    { code: 'malay', name: 'Malay', flag: '🇲🇾' },
+    { code: 'indonesian', name: 'Indonesian', flag: '🇮🇩' },
+    { code: 'polish', name: 'Polish', flag: '🇵🇱' },
+    { code: 'romanian', name: 'Romanian', flag: '🇷🇴' },
+    { code: 'ukrainian', name: 'Ukrainian', flag: '🇺🇦' },
   ];
+
+  // Helper function to determine text direction
+  function getDirection(lang: string) {
+    // Add more RTL languages as needed
+    const rtlLangs = ['urdu', 'ar', 'arabic', 'he', 'hebrew', 'fa', 'farsi', 'ps', 'pashto'];
+    return rtlLangs.includes(lang.toLowerCase()) ? 'rtl' : 'ltr';
+  }
 
   const handleSubmit = async () => {
     if (!url) return;
@@ -168,6 +232,9 @@ export default function EnhancedBlogSummarizer() {
     setBlogText('');
     setSummary('');
     setUrduSummary('');
+    // Remove title and category state
+    // setTitle('');
+    // setCategory('');
 
     try {
       // 1. Scrape blog content
@@ -217,7 +284,7 @@ export default function EnhancedBlogSummarizer() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ url, summary: urduData.translation }),
+          body: JSON.stringify({ url, summary: urduData.translation, reads: 0 }),
         }),
         fetch('/api/save-fulltext', {
           method: 'POST',
@@ -257,6 +324,20 @@ export default function EnhancedBlogSummarizer() {
     } catch {
       return false;
     }
+  };
+
+  const handleViewSummary = async (summary: Summary) => {
+    // Increment reads in the backend
+    await fetch('/api/save-summary', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: summary.id }),
+    });
+    // Optionally, update reads in local state
+    setViewedSummary(summary);
+    setViewModalOpen(true);
+    // Optionally, refresh recent summaries
+    // fetchRecentSummaries();
   };
 
   const NavigationMenu = () => (
@@ -437,7 +518,7 @@ export default function EnhancedBlogSummarizer() {
                       <div className="flex justify-center mb-2">
                         <Languages className="w-6 h-6 text-blue-600" />
                       </div>
-                      <div className="text-2xl font-bold text-gray-900">1+</div>
+                      <div className="text-2xl font-bold text-gray-900">20+</div>
                       <div className="text-sm text-gray-600">Languages Supported</div>
                     </div>
                     <div className="text-center">
@@ -468,6 +549,7 @@ export default function EnhancedBlogSummarizer() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Remove title and category input fields */}
                 <div className="flex flex-col lg:flex-row gap-4">
                   <div className="flex-1">
                     <Input
@@ -766,8 +848,8 @@ export default function EnhancedBlogSummarizer() {
                       <Textarea
                         value={urduSummary}
                         readOnly
-                        className="min-h-[250px] max-h-[400px] resize-none bg-purple-50 border-0 text-base leading-relaxed text-right custom-scrollbar rounded-xl p-4"
-                        dir="rtl"
+                        className="min-h-[250px] max-h-[400px] resize-none bg-purple-50 border-0 text-base leading-relaxed custom-scrollbar rounded-xl p-4"
+                        dir={getDirection(selectedLanguage)}
                       />
                     </CardContent>
                   </Card>
@@ -862,13 +944,20 @@ export default function EnhancedBlogSummarizer() {
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3">{item.url}</p>
+                      <p className="text-sm text-gray-600 mb-1">{item.url}</p>
+                      {item.category && (
+                        <p className="text-xs text-gray-500 mb-1">Category: {item.category}</p>
+                      )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           <Clock className="w-4 h-4" />
                           {item.created_at ? new Date(item.created_at).toLocaleString() : ''}
                         </div>
-                        <Button variant="outline" size="sm">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Eye className="w-4 h-4" />
+                          {item.reads !== undefined ? `${item.reads} reads` : ''}
+                        </div>
+                        <Button variant="outline" size="sm" onClick={() => handleViewSummary(item as Summary)}>
                           <Eye className="w-4 h-4 mr-2" />
                           View
                         </Button>
@@ -892,7 +981,7 @@ export default function EnhancedBlogSummarizer() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">Total Summaries</p>
-                      <p className="text-2xl font-bold text-gray-900">147</p>
+                      <p className="text-2xl font-bold text-gray-900">{totalSummaries ?? '---'}</p>
                     </div>
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <FileText className="w-6 h-6 text-blue-600" />
@@ -1084,6 +1173,26 @@ export default function EnhancedBlogSummarizer() {
           </div>
         </div>
       </footer>
+
+      {viewModalOpen && viewedSummary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setViewModalOpen(false)}>
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-bold mb-2">{viewedSummary.url}</h2>
+            <p className="text-sm text-gray-500 mb-2">{viewedSummary.summary}</p>
+            <p className="text-xs text-gray-400 mb-2">{viewedSummary.created_at ? new Date(viewedSummary.created_at).toLocaleString() : ''}</p>
+            <div className="my-4 p-4 bg-gray-50 rounded text-base text-gray-800 whitespace-pre-line">
+              {viewedSummary.summary}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Eye className="w-4 h-4" />
+              {viewedSummary.reads !== undefined ? `${viewedSummary.reads + 1} reads` : ''}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

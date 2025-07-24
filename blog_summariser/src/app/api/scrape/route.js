@@ -15,6 +15,9 @@ export async function POST(req) {
       blogText += $(el).text() + '\n';
     });
 
+    // Trim whitespace and empty lines from start and end
+    blogText = blogText.replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');
+
     return Response.json({ success: true, content: blogText });
   } catch (error) {
     return Response.json({ success: false, error: error.message });
