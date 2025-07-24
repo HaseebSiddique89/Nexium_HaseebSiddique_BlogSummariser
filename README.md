@@ -11,7 +11,7 @@ A full-stack AI-powered web application that:
 ## Features
 
 - **AI Summarization:** Uses HuggingFace’s `facebook/bart-large-cnn` model to generate summaries that are 30–40% the length of the original text.
-- **Dynamic Translation:** Translates summaries into Urdu (or other languages) using Google Gemini API.
+- **Dynamic Translation:** Translates summaries into 20+ languages.
 - **Clean Output:** All whitespace and empty lines are trimmed from scraped text, summaries, and translations.
 - **Recent Summaries & Analytics:** View recent activity and usage statistics.
 - **Modern UI:** Built with Next.js, React, and a beautiful, responsive design.
