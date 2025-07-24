@@ -52,7 +52,7 @@ export async function POST(req) {
       } else if (result.error) {
         errorMsg = result.error;
       }
-    } catch (e) {
+    } catch {
       errorMsg = 'Failed to parse HuggingFace response.';
     }
     // Trim whitespace and empty lines from summary

@@ -81,7 +81,7 @@ export default function EnhancedBlogSummarizer() {
         } else {
           setRecentSummariesError('Failed to load recent summaries');
         }
-      } catch (err) {
+      } catch {
         setRecentSummariesError('Failed to load recent summaries');
       } finally {
         setRecentSummariesLoading(false);
@@ -107,7 +107,7 @@ export default function EnhancedBlogSummarizer() {
         } else {
           setPopularBlogsError('Failed to load popular blogs');
         }
-      } catch (err) {
+      } catch {
         setPopularBlogsError('Failed to load popular blogs');
       } finally {
         setPopularBlogsLoading(false);
@@ -145,7 +145,7 @@ export default function EnhancedBlogSummarizer() {
         } else {
           setStatsError('Failed to load stats');
         }
-      } catch (err) {
+      } catch {
         setStatsError('Failed to load stats');
       } finally {
         setStatsLoading(false);
