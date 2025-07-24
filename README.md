@@ -15,6 +15,7 @@ A full-stack AI-powered web application that:
 - **Clean Output:** All whitespace and empty lines are trimmed from scraped text, summaries, and translations.
 - **Recent Summaries & Analytics:** View recent activity and usage statistics.
 - **Modern UI:** Built with Next.js, React, and a beautiful, responsive design.
+- **Reads Tracking:** Tracks and displays how many times each summary has been viewed, with real-time updates.
 
 ---
 
