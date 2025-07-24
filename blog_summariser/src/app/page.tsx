@@ -328,15 +328,19 @@ export default function EnhancedBlogSummarizer() {
   };
 
   const handleViewSummary = async (summary: Summary) => {
-    // Increment reads in the backend
-    await fetch('/api/save-summary', {
+    // Increment reads in the backend and get updated summary
+    const res = await fetch('/api/save-summary', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: summary.id }),
     });
-    // Refresh recent summaries to get updated reads
+    const result = await res.json();
+    let updatedSummary = summary;
+    if (result.success && result.data) {
+      updatedSummary = result.data;
+    }
     fetchRecentSummaries();
-    setViewedSummary(summary);
+    setViewedSummary(updatedSummary);
     setViewModalOpen(true);
   };
 
@@ -1183,6 +1187,10 @@ export default function EnhancedBlogSummarizer() {
             <h2 className="text-lg font-bold mb-2 break-all">{viewedSummary.url}</h2>
             <div className="my-4 p-4 bg-gray-50 rounded text-base text-gray-800 whitespace-pre-line">
               {viewedSummary.summary}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Eye className="w-4 h-4" />
+              {viewedSummary.reads !== undefined ? `${viewedSummary.reads} reads` : ''}
             </div>
           </div>
         </div>

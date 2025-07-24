@@ -19,13 +19,22 @@ export async function POST(req) {
 export async function PATCH(req) {
   try {
     const { id } = await req.json();
+    // Fetch current reads value
+    const { data: current, error: fetchError } = await supabase
+      .from('summaries')
+      .select('reads')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
+    const currentReads = typeof current.reads === 'number' ? current.reads : 0;
+    // Increment and update
     const { data, error } = await supabase
       .from('summaries')
-      .update({ reads: supabase.raw('reads + 1') })
+      .update({ reads: currentReads + 1 })
       .eq('id', id)
       .select();
     if (error) throw error;
-    return Response.json({ success: true, data });
+    return Response.json({ success: true, data: data && data[0] });
   } catch (error) {
     return Response.json({ success: false, error: error.message });
   }
