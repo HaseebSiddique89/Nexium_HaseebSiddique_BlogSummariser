@@ -81,28 +81,29 @@ export default function EnhancedBlogSummarizer() {
   ];
 
   // State for live recent summaries
-  const [recentSummaries, setRecentSummaries] = useState<Array<{ title?: string; url: string; created_at?: string; category?: string; reads?: number }>>([]);
+  const [recentSummaries, setRecentSummaries] = useState<Array<Summary>>([]);
   const [recentSummariesLoading, setRecentSummariesLoading] = useState(true);
   const [recentSummariesError, setRecentSummariesError] = useState('');
 
-  useEffect(() => {
-    async function fetchRecentSummaries() {
-      setRecentSummariesLoading(true);
-      setRecentSummariesError('');
-      try {
-        const res = await fetch('/api/recent-summaries');
-        const data = await res.json();
-        if (data.success) {
-          setRecentSummaries(data.summaries);
-        } else {
-          setRecentSummariesError('Failed to load recent summaries');
-        }
-      } catch {
+  async function fetchRecentSummaries() {
+    setRecentSummariesLoading(true);
+    setRecentSummariesError('');
+    try {
+      const res = await fetch('/api/recent-summaries');
+      const data = await res.json();
+      if (data.success) {
+        setRecentSummaries(data.summaries);
+      } else {
         setRecentSummariesError('Failed to load recent summaries');
-      } finally {
-        setRecentSummariesLoading(false);
       }
+    } catch {
+      setRecentSummariesError('Failed to load recent summaries');
+    } finally {
+      setRecentSummariesLoading(false);
     }
+  }
+
+  useEffect(() => {
     fetchRecentSummaries();
   }, []);
 
@@ -333,11 +334,10 @@ export default function EnhancedBlogSummarizer() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: summary.id }),
     });
-    // Optionally, update reads in local state
+    // Refresh recent summaries to get updated reads
+    fetchRecentSummaries();
     setViewedSummary(summary);
     setViewModalOpen(true);
-    // Optionally, refresh recent summaries
-    // fetchRecentSummaries();
   };
 
   const NavigationMenu = () => (
@@ -1180,15 +1180,9 @@ export default function EnhancedBlogSummarizer() {
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setViewModalOpen(false)}>
               <X className="w-5 h-5" />
             </button>
-            <h2 className="text-2xl font-bold mb-2">{viewedSummary.url}</h2>
-            <p className="text-sm text-gray-500 mb-2">{viewedSummary.summary}</p>
-            <p className="text-xs text-gray-400 mb-2">{viewedSummary.created_at ? new Date(viewedSummary.created_at).toLocaleString() : ''}</p>
+            <h2 className="text-lg font-bold mb-2 break-all">{viewedSummary.url}</h2>
             <div className="my-4 p-4 bg-gray-50 rounded text-base text-gray-800 whitespace-pre-line">
               {viewedSummary.summary}
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Eye className="w-4 h-4" />
-              {viewedSummary.reads !== undefined ? `${viewedSummary.reads + 1} reads` : ''}
             </div>
           </div>
         </div>
